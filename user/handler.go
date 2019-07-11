@@ -1,6 +1,8 @@
 package user
 
 import (
+	"errors"
+	"go-chi/common"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -25,15 +27,13 @@ func (h *Handler) Routes() http.Handler {
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data := &SignUpRequest{}
 	if err := render.Bind(r, data); err != nil {
-		render.Status(r, http.StatusUnprocessableEntity)
-		render.JSON(w, r, render.M{"message": err.Error()})
+		render.Render(w, r, common.ErrorUnprocessable(err))
 		return
 	}
 
 	user := data.User
 	if err := h.store.Create(user); err != nil {
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, render.M{"message": "Unable to create user"})
+		render.Render(w, r, common.ErrorRender(errors.New("Unable to create user"), http.StatusBadRequest))
 		return
 	}
 
@@ -44,15 +44,13 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	data := &LogiInRequest{}
 	if err := render.Bind(r, data); err != nil {
-		render.Status(r, http.StatusUnprocessableEntity)
-		render.JSON(w, r, render.M{"message": err.Error()})
+		render.Render(w, r, common.ErrorUnprocessable(err))
 		return
 	}
 
 	u, e := h.store.FindByLogin(data.Email, data.Password)
 	if e != nil {
-		render.Status(r, http.StatusUnauthorized)
-		render.JSON(w, r, render.M{"message": e.Error()})
+		render.Render(w, r, common.ErrorUnauthorized(e))
 		return
 	}
 
