@@ -46,12 +46,17 @@ type LogiInRequest struct {
 
 // Bind login request
 func (b *LogiInRequest) Bind(r *http.Request) error {
+	v := common.ErrorValidation{}
 	if b.Email == "" {
-		return errors.New("Email cannot empty")
+		v.AddError("email", errors.New("Email cannot empty"))
 	}
 
 	if b.Password == "" {
-		return errors.New("Password cannot empty")
+		v.AddError("password", errors.New("Password cannot empty"))
+	}
+
+	if len(v.Fields) > 0 {
+		return v.Get()
 	}
 
 	return nil

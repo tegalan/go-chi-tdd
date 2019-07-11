@@ -84,21 +84,43 @@ func (s *UserHandlerTestSuite) TestUserSignUp() {
 	}
 }
 
+//func (s *UserHandlerTestSuite) TestEmptySignUp() {
+//	req, err := http.NewRequest("POST", "/user", bytes.NewBuffer([]byte{}))
+//	req.Header.Set("Content-Type", "application/json")
+//
+//	s.NoError(err)
+//	store := new(MockStore)
+//	handler := Handler{
+//		store: store,
+//	}
+//	rr := httptest.NewRecorder()
+//	c := http.HandlerFunc(handler.SignUp)
+//	c.ServeHTTP(rr, req)
+//
+//	s.Equal(http.StatusUnprocessableEntity, rr.Code)
+//}
+
 func (s *UserHandlerTestSuite) TestUserLogin() {
 
 	tests := []struct {
+		email    string
+		password string
 		user     User
 		expected int
 	}{
-		{
-			user:     User{Name: "Moana", Email: "moana@motunui.is", Password: "heiheithechicken"},
+		{ //Existing user
+			email:    "moana@motunui.is",
+			password: "heiheithechicken",
+			user:     User{Name: "Moana", Email: "moana@motunui.is", Password: "$2y$12$LX9yhsMiB8n9wmAhRfQLRugtT3nVBhC.DIbdr3hJcYBI4CV5nUfIO"},
 			expected: http.StatusOK,
 		},
-		{
+		{ // Empty payload
 			user:     User{},
 			expected: http.StatusUnprocessableEntity,
 		},
-		{
+		{ // User Not Exist
+			email:    "tekka@motunui.is",
+			password: "tefiti",
 			user:     User{Name: "Tekka", Email: "tekka@motunui.is", Password: "tefiti"},
 			expected: http.StatusUnauthorized,
 		},
@@ -106,7 +128,7 @@ func (s *UserHandlerTestSuite) TestUserLogin() {
 
 	for _, test := range tests {
 
-		pld, _ := json.Marshal(map[string]string{"email": test.user.Email, "password": test.user.Password})
+		pld, _ := json.Marshal(map[string]string{"email": test.email, "password": test.password})
 		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(pld))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -124,7 +146,7 @@ func (s *UserHandlerTestSuite) TestUserLogin() {
 		c := http.HandlerFunc(handler.Login)
 		c.ServeHTTP(rr, req)
 
-		s.Equal(test.expected, rr.Code)
+		s.Equal(test.expected, rr.Code, rr.Body.String())
 
 		var res User
 		if err := json.Unmarshal(rr.Body.Bytes(), &res); err != nil {
