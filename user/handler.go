@@ -14,11 +14,19 @@ type Handler struct {
 	store Store
 }
 
+// NewHandler ...
+func NewHandler(s Store) Handler {
+	return Handler{
+		store: s,
+	}
+}
+
 // Routes to mounted on chi
 func (h *Handler) Routes() http.Handler {
 	r := chi.NewRouter()
 
-	r.Post("/", h.SignUp)
+	r.Post("/signup", h.SignUp)
+	r.Post("/login", h.Login)
 
 	return r
 }
