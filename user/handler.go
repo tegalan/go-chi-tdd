@@ -25,8 +25,8 @@ func (h *Handler) Routes() http.Handler {
 func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	data := &SignUpRequest{}
 	if err := render.Bind(r, data); err != nil {
-		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, render.M{"message": "Error bad request"})
+		render.Status(r, http.StatusUnprocessableEntity)
+		render.JSON(w, r, render.M{"message": err.Error()})
 		return
 	}
 
