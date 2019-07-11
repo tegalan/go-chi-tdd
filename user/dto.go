@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"go-chi/common"
 	"net/http"
 )
 
@@ -12,21 +13,28 @@ type SignUpRequest struct {
 
 // Bind to user
 func (b *SignUpRequest) Bind(r *http.Request) error {
+	v := common.ErrorValidation{}
+
 	if b.User == nil {
 		return errors.New("Empty request")
 	}
 
 	if b.User.Email == "" {
-		return errors.New("Email cannot empty")
+		v.AddError("email", errors.New("Email cannot empty"))
 	}
 
 	if b.User.Name == "" {
-		return errors.New("Name cannot empty")
+		v.AddError("name", errors.New("Name cannot empty"))
 	}
 
 	if b.User.Password == "" {
-		return errors.New("Password cannot empty")
+		v.AddError("password", errors.New("Password cannot empty"))
 	}
+
+	if len(v.Fields) > 0 {
+		return v.Get()
+	}
+
 	return nil
 }
 
