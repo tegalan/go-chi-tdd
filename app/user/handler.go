@@ -55,18 +55,21 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 // Login handler
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+	// Handle payload
 	data := &LogiInRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, common.ErrorUnprocessable(err))
 		return
 	}
 
+	// Find user record from store
 	u, e := h.store.FindByLogin(data.Email, data.Password)
 	if e != nil {
 		render.Render(w, r, common.ErrorUnauthorized(e))
 		return
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, u)
+	// Generate Token
+	var token string
+	render.Render(w, r, NewLoginResponse(u, token))
 }

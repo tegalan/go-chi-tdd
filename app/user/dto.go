@@ -4,6 +4,8 @@ import (
 	"errors"
 	"go-chi/common"
 	"net/http"
+
+	"github.com/go-chi/render"
 )
 
 // SignUpRequest ...
@@ -60,4 +62,24 @@ func (b *LogiInRequest) Bind(r *http.Request) error {
 	}
 
 	return nil
+}
+
+// LoginResponse struct
+type LoginResponse struct {
+	*User
+	Password string `json:"password,omitempty"`
+	Token    string `json:"token"`
+}
+
+// Render login response
+func (l *LoginResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+// NewLoginResponse ...
+func NewLoginResponse(u User, token string) render.Renderer {
+	return &LoginResponse{
+		User:  &u,
+		Token: token,
+	}
 }
