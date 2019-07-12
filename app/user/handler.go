@@ -5,7 +5,9 @@ import (
 	"go-chi/common"
 	"go-chi/router"
 	"net/http"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 )
@@ -70,6 +72,16 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate Token
-	var token string
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"exp": time.Now().Add(time.Minute * 30).Unix(),
+	})
+
+	// TODO: create secure secret
+	token, err := t.SignedString([]byte("rahasia"))
+
+	if err != nil {
+		render.Render(w, r, common.ErrorRender(errors.New("Failed when generate token"), http.StatusInternalServerError))
+	}
+
 	render.Render(w, r, NewLoginResponse(u, token))
 }

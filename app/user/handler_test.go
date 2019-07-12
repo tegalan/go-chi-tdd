@@ -84,22 +84,6 @@ func (s *UserHandlerTestSuite) TestUserSignUp() {
 	}
 }
 
-//func (s *UserHandlerTestSuite) TestEmptySignUp() {
-//	req, err := http.NewRequest("POST", "/user", bytes.NewBuffer([]byte{}))
-//	req.Header.Set("Content-Type", "application/json")
-//
-//	s.NoError(err)
-//	store := new(MockStore)
-//	handler := Handler{
-//		store: store,
-//	}
-//	rr := httptest.NewRecorder()
-//	c := http.HandlerFunc(handler.SignUp)
-//	c.ServeHTTP(rr, req)
-//
-//	s.Equal(http.StatusUnprocessableEntity, rr.Code)
-//}
-
 func (s *UserHandlerTestSuite) TestUserLogin() {
 
 	tests := []struct {
@@ -148,13 +132,14 @@ func (s *UserHandlerTestSuite) TestUserLogin() {
 
 		s.Equal(test.expected, rr.Code, rr.Body.String())
 
-		var res User
+		var res LoginResponse
 		if err := json.Unmarshal(rr.Body.Bytes(), &res); err != nil {
 			s.NoError(err)
 		}
 
 		if rr.Code == http.StatusOK {
 			s.Equal(test.user.Name, res.Name, fmt.Sprintf("Unexpected result: %s expected %s", res.Name, test.user.Name))
+			s.NotEmpty(res.Token, "Token empty")
 		}
 
 	}
