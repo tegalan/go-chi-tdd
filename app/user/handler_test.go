@@ -10,46 +10,55 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 	"github.com/stretchr/testify/suite"
 )
 
 type UserHandlerTestSuite struct {
 	suite.Suite
-	Handler Handler
+	Router *chi.Mux
 }
 
 // SetupTest run before test
 func (s *UserHandlerTestSuite) SetupTest() {
-
+	s.Router = chi.NewMux()
 }
 
 func (s *UserHandlerTestSuite) TestGetRoutes() {
-	h := s.Handler.Routes()
-
-	r := chi.NewRouter()
-	r.Mount("/user", h)
+	h := Handler{}
+	h.RegisterRouter(s.Router)
 }
 
 func (s *UserHandlerTestSuite) TestUserSignUp() {
 	tests := []struct {
-		user  User
-		store error
-		code  int
+		user    User
+		payload render.M
+		store   error
+		code    int
 	}{
 		{
-			user:  User{},
-			store: nil,
-			code:  http.StatusUnprocessableEntity,
+			payload: render.M{},
+			user:    User{},
+			store:   nil,
+			code:    http.StatusUnprocessableEntity,
 		},
 		{
-			user:  User{Name: "Moana", Email: "moana@motunui.is", Password: "heiheithechicken"},
-			store: nil,
-			code:  http.StatusOK,
+			payload: render.M{"name": "", "": "", "password": ""},
+			user:    User{},
+			store:   nil,
+			code:    http.StatusUnprocessableEntity,
 		},
 		{
-			user:  User{Name: "Tekka", Email: "tekka@motunui.is", Password: "tefiti"},
-			store: errors.New("Unable to save user"),
-			code:  http.StatusBadRequest,
+			payload: render.M{"name": "Moana", "email": "moana@motunui.is", "password": "heiheithechicken"},
+			user:    User{Name: "Moana", Email: "moana@motunui.is", Password: "heiheithechicken"},
+			store:   nil,
+			code:    http.StatusOK,
+		},
+		{
+			payload: render.M{"name": "Tekka", "email": "tekka@motunui.is", "password": "tefiti"},
+			user:    User{Name: "Tekka", Email: "tekka@motunui.is", Password: "tefiti"},
+			store:   errors.New("Unable to save user"),
+			code:    http.StatusBadRequest,
 		},
 	}
 
@@ -58,11 +67,9 @@ func (s *UserHandlerTestSuite) TestUserSignUp() {
 		st := new(MockStore)
 		st.On("Create", &user).Return(test.store)
 
-		handler := Handler{
-			store: st,
-		}
+		handler := NewHandler(st)
 
-		pld, _ := json.Marshal(user)
+		pld, _ := json.Marshal(test.payload)
 		req, err := http.NewRequest("POST", "/user", bytes.NewBuffer(pld))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -122,9 +129,8 @@ func (s *UserHandlerTestSuite) TestUserLogin() {
 		st := new(MockStore)
 		st.On("FindByLogin", "moana@motunui.is", "heiheithechicken").Return(test.user, nil)
 		st.On("FindByLogin", "tekka@motunui.is", "tefiti").Return(User{}, errors.New("User Not Found"))
-		handler := Handler{
-			store: st,
-		}
+
+		handler := NewHandler(st)
 
 		rr := httptest.NewRecorder()
 		c := http.HandlerFunc(handler.Login)

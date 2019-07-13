@@ -24,13 +24,14 @@ func NewHandler(s Store) Handler {
 	return h
 }
 
-// Routes to mounted on chi
-func (h *Handler) Routes() http.Handler {
+// RegisterRouter to mounted on chi
+func (h *Handler) RegisterRouter(router *chi.Mux) http.Handler {
 	r := chi.NewRouter()
 
 	r.Post("/signup", h.SignUp)
 	r.Post("/login", h.Login)
 
+	router.Mount("/user", r)
 	return r
 }
 
