@@ -52,7 +52,7 @@ func (s *UserHandlerTestSuite) TestUserSignUp() {
 			payload: render.M{"name": "Moana", "email": "moana@motunui.is", "password": "heiheithechicken"},
 			user:    User{Name: "Moana", Email: "moana@motunui.is", Password: "heiheithechicken"},
 			store:   nil,
-			code:    http.StatusOK,
+			code:    http.StatusCreated,
 		},
 		{
 			payload: render.M{"name": "Tekka", "email": "tekka@motunui.is", "password": "tefiti"},

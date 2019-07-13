@@ -1,0 +1,26 @@
+http://localhost:8000
+Accept: application/json
+Content-Type: application/json
+--
+
+# Home
+--
+GET /
+
+
+# User Login
+--
+POST /user/login
+{
+    "email":"tekka@motunui.is",
+    "password":"tefiti"
+}
+
+# User Sign Up
+--
+POST /user/signup
+{
+    "name":"Tekka",
+    "email": "tekkar@motunui.is",
+    "password": "tefiti"
+}

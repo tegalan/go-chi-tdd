@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"go-chi/common"
+	"log"
 	"net/http"
 	"time"
 
@@ -45,11 +46,12 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	user := data.User
 	if err := h.store.Create(user); err != nil {
+		log.Println(err)
 		render.Render(w, r, common.ErrorRender(errors.New("Unable to create user"), http.StatusBadRequest))
 		return
 	}
 
-	render.JSON(w, r, user)
+	render.Render(w, r, NewSignupRequest(user))
 }
 
 // Login handler

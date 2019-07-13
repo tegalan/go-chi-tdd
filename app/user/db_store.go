@@ -7,14 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User struct
-type User struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 // DatabaseStore implement User Store Interface
 type DatabaseStore struct {
 	DB *sql.DB
@@ -32,6 +24,17 @@ func (m *DatabaseStore) Delete(id int) error {
 
 // Create implement interface
 func (m *DatabaseStore) Create(u *User) error {
+
+	if err := u.BeforeCreate(); err != nil {
+		return err
+	}
+
+	var id int
+	if err := m.DB.QueryRow("INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING id", u.Name, u.Email, u.Password).Scan(&id); err != nil {
+		return err
+	}
+
+	u.ID = id
 	return nil
 }
 

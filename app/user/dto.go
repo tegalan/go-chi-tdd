@@ -83,3 +83,20 @@ func NewLoginResponse(u User, token string) render.Renderer {
 		Token: token,
 	}
 }
+
+// SignUpResponse struct
+type SignUpResponse struct {
+	*User
+	Password string `json:"password,omitempty"`
+}
+
+// Render sign up response
+func (s *SignUpResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	render.Status(r, http.StatusCreated)
+	return nil
+}
+
+// NewSignupRequest ...
+func NewSignupRequest(u *User) render.Renderer {
+	return &SignUpResponse{User: u}
+}

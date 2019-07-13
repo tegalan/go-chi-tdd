@@ -10,7 +10,7 @@ func init() {
 
 func up0001(tx *sql.Tx) error {
 	// Create table schema
-	_, err := tx.Exec(`CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR NULL, email VARCHAR NOT NULL, password VARCHAR NOT NULL)`)
+	_, err := tx.Exec(`CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR NULL, email VARCHAR NOT NULL, password VARCHAR NOT NULL, UNIQUE(email))`)
 
 	if err != nil {
 		//tx.Rollback()
