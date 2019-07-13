@@ -3,7 +3,6 @@ package user
 import (
 	"errors"
 	"go-chi/common"
-	"go-chi/router"
 	"net/http"
 	"time"
 
@@ -17,14 +16,11 @@ type Handler struct {
 	store Store
 }
 
-// Register ...
-func Register(s Store) Handler {
+// NewHandler ...
+func NewHandler(s Store) Handler {
 	h := Handler{
 		store: s,
 	}
-
-	r := router.GetRouter()
-	r.Mount("/user/", h.Routes())
 	return h
 }
 

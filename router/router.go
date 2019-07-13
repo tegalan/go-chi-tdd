@@ -13,27 +13,21 @@ import (
 	"github.com/go-chi/render"
 )
 
-var route *chi.Mux
+// GetRouter get router
+func GetRouter() *chi.Mux {
 
-func init() {
-	route = chi.NewMux()
+	route := chi.NewMux()
+
 	route.Use(middleware.Logger)
-	//route.Use(middleware.Recoverer)
 	route.Use(Recover)
+
 	route.MethodNotAllowed(MethodNotAllowedHandler)
 	route.NotFound(NotFoundHandler)
 
-	route.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello world!"))
-	})
-
-	route.Get("/500", func(w http.ResponseWriter, r *http.Request) {
+	route.Get("/test/500", func(w http.ResponseWriter, r *http.Request) {
 		panic("Oops, recover me!")
 	})
-}
 
-// GetRouter get router
-func GetRouter() *chi.Mux {
 	return route
 }
 

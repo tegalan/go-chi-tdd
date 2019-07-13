@@ -26,11 +26,12 @@ func main() {
 		return
 	}
 
-	// Register User Resource
-	user.Register(&user.DatabaseStore{DB: db})
-	//r.Mount("/user", user.Routes())
-
 	r := router.GetRouter()
+	// Register User Resource
+	u := user.NewHandler(&user.DatabaseStore{DB: db})
+
+	r.Mount("/user", u.Routes())
+
 	http.ListenAndServe(":8000", r)
 }
 
