@@ -39,15 +39,15 @@ func InitMigration(db *sql.DB) {
 	if err != nil {
 		if e, ok := err.(*pq.Error); ok {
 			if e.Code.Name() == "undefined_table" {
-				CreateMigrationsTable(db)
+				createMigrationsTable(db)
 				return
 			}
 		}
 	}
 }
 
-// CreateMigrationsTable ...
-func CreateMigrationsTable(db *sql.DB) {
+// createMigrationsTable ...
+func createMigrationsTable(db *sql.DB) {
 	log.Println("0000 - Initializing migrations table")
 	_, err := db.Exec("CREATE TABLE migrations (version SERIAL PRIMARY KEY, step INTEGER NOT NULL)")
 	if err != nil {
