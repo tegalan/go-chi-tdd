@@ -7,7 +7,9 @@ env:
 
 script: 
   - go mod download
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - go get -u github.com/haya14busa/goverage
+  - go test -v -race ./...
+  - goverage -v -coverprofile=coverage.txt -covermode=atomic -race ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) 
