@@ -10,5 +10,5 @@ require (
 	github.com/lib/pq v1.8.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20200930160638-afb6bcd081ae
+	golang.org/x/crypto v0.0.0-20201001193750-eb9a90e9f9cb
 )
